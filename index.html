@@ -8,6 +8,12 @@
   </head>
   <body>
     <div id="app"></div>
-    <script type="module" src="/src/main.js"></script>
+    <script type="module" src="/src/index.js"></script>
+    <script type="module" src="/node_modules/@google/model-viewer/dist/model-viewer.min.js"></script>
+
+    <model-viewer style="position: absolute; width: 100%; height: 100%;" src="/DamagedHelmet.glb" camera-controls>
+      <model-stats></model-stats>
+    </model-viewer>
+    
   </body>
 </html>
