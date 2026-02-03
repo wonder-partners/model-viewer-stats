@@ -21,6 +21,14 @@ export class ModelStats extends HTMLElement {
 		}
 	}
 
+	toggle() {
+		if (this.hasAttribute("visible")) {
+			this.removeAttribute("visible");
+		} else {
+			this.setAttribute("visible", "");
+		}
+	}
+
 	render() {
 		this.shadowRoot.innerHTML = html`
 		<style>
@@ -157,8 +165,6 @@ export class ModelStats extends HTMLElement {
 		this.updateText("mat", materials.size.toString());
 		this.updateText("tex", textures.size.toString());
 		this.updateText("anim", animationCount.toString());
-
-		this.setAttribute("visible", "");
 	}
 
 	updateText(id, text) {
