@@ -65,6 +65,12 @@ cd model-viewer-stats
 npm install
 ```
 
+### Start the development server
+
+```bash
+npm run dev
+```
+
 ### Build Output
 
 The build produces two bundles in the `dist/` directory:
