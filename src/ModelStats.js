@@ -1,3 +1,5 @@
+const html = String.raw;
+
 export class ModelStats extends HTMLElement {
 	constructor() {
 		super();
@@ -18,7 +20,7 @@ export class ModelStats extends HTMLElement {
 	}
 
 	render() {
-		this.shadowRoot.innerHTML = `
+		this.shadowRoot.innerHTML = html`
 		<style>
 		:host {
 			position: absolute;
@@ -38,7 +40,7 @@ export class ModelStats extends HTMLElement {
 		.val { font-weight: bold; font-family: monospace; }
 		</style>
 		<div class="row"><span>Tris:</span><span class="val" id="tri">...</span></div>
-    `;
+    	`;
 	}
 
 	calculateStats() {
