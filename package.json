@@ -8,12 +8,15 @@
   },
   "type": "module",
   "files": [
-    "dist"
+    "dist",
+    "src"
   ],
   "main": "./dist/model-viewer-stats.umd.cjs",
   "module": "./dist/model-viewer-stats.js",
+  "types": "./src/index.d.ts",
   "exports": {
     ".": {
+      "types": "./src/index.d.ts",
       "import": "./dist/model-viewer-stats.js",
       "require": "./dist/model-viewer-stats.umd.cjs"
     }
