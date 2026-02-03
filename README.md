@@ -1,4 +1,4 @@
-# @wonder/model-viewer-stats
+# `<model-viewer-stats>`
 
 A lightweight web component that displays comprehensive statistics for 3D models rendered with Google's `<model-viewer>`.
 
@@ -19,7 +19,7 @@ A lightweight web component that displays comprehensive statistics for 3D models
 ## Installation
 
 ```bash
-npm install @wonder/model-viewer-stats
+npm install @wonder-partners/model-viewer-stats
 ```
 
 ### Peer Dependencies
@@ -33,7 +33,7 @@ Import the package and use the `<model-stats>` element inside your `<model-viewe
 ```html
 <script type="module">
   import '@google/model-viewer';
-  import '@wonder/model-viewer-stats';
+  import '@wonder-partners/model-viewer-stats';
 </script>
 
 <model-viewer src="/path/to/model.glb" camera-controls>
@@ -45,13 +45,13 @@ Import the package and use the `<model-stats>` element inside your `<model-viewe
 ### ES Module Import
 
 ```javascript
-import { ModelStats } from '@wonder/model-viewer-stats';
+import { ModelStats } from '@wonder-partners/model-viewer-stats';
 ```
 
 ### UMD (CommonJS)
 
 ```javascript
-const { ModelStats } = require('@wonder/model-viewer-stats');
+const { ModelStats } = require('@wonder-partners/model-viewer-stats');
 ```
 
 ## API & Interaction
