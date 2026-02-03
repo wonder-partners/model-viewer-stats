@@ -66,10 +66,12 @@ export class ModelStats extends HTMLElement {
 		</style>
 
 		<div class="row"><span class="label">File size:</span><span class="val" id="file">-</span></div>
-		<div class="row"><span class="label">Dimensions:</span><span class="val" id="size">-</span></div>
+		<div class="row"><span class="label">Dimensions (W x H x D):</span><span class="val" id="size">-</span></div>
 		<div class="row"><span class="label">Triangles:</span><span class="val" id="tri">-</span></div>
+		<div class="row"><span class="label">Meshes:</span><span class="val" id="mesh">-</span></div>
 		<div class="row"><span class="label">Materials:</span><span class="val" id="mat">-</span></div>
 		<div class="row"><span class="label">Textures:</span><span class="val" id="tex">-</span></div>
+		<div class="row"><span class="label">Animations:</span><span class="val" id="anim">-</span></div>
     	`;
 	}
 
@@ -102,12 +104,14 @@ export class ModelStats extends HTMLElement {
 		}
 
 		let triCount = 0;
+		let meshCount = 0;
 		const materials = new Set();
 		const textures = new Set();
 		const box = new Box3();
 
 		scene.traverse((obj) => {
 			if (obj.isMesh && obj.geometry) {
+				meshCount++;
 				const geom = obj.geometry;
 				triCount += geom.index ? geom.index.count / 3 : geom.attributes.position.count / 3;
 
@@ -139,14 +143,20 @@ export class ModelStats extends HTMLElement {
 			// box.getSize returns width, height, depth.
 			// Let's assume Y is up, but just printing dimensions is fine.
 			const fmt = (n) => `${n.toFixed(2)}`;
-			this.updateText("size", `${fmt(size.x)}W x ${fmt(size.y)}H x ${fmt(size.z)}D`);
+			this.updateText("size", `${fmt(size.x)} x ${fmt(size.y)} x ${fmt(size.z)}`);
 		} else {
 			this.updateText("size", "0m");
 		}
 
+		const animationCount = this.viewer.availableAnimations
+			? this.viewer.availableAnimations.length
+			: 0;
+
 		this.updateText("tri", Math.round(triCount).toLocaleString());
+		this.updateText("mesh", meshCount.toLocaleString());
 		this.updateText("mat", materials.size.toString());
 		this.updateText("tex", textures.size.toString());
+		this.updateText("anim", animationCount.toString());
 
 		this.setAttribute("visible", "");
 	}
