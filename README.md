@@ -73,3 +73,12 @@ The build produces two bundles in the `dist/` directory:
 - `model-viewer-stats.umd.cjs` - UMD/CommonJS bundle
 
 External dependencies (`@google/model-viewer`, `three`) are not bundled.
+
+### Linting
+
+This project uses [Biome](https://biomejs.dev/) for linting and formatting.
+
+```bash
+npm run lint      # Check for issues
+npm run format    # Auto-fix issues
+```
