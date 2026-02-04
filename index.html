@@ -12,8 +12,16 @@
     <script type="module" src="/node_modules/@google/model-viewer/dist/model-viewer.min.js"></script>
 
     <model-viewer style="position: absolute; width: 100%; height: 100%;" src="/DamagedHelmet.glb" camera-controls>
-      <model-stats></model-stats>
+      <model-stats id="stats"></model-stats>
+      <button id="toggle-stats" style="position: absolute; bottom: 1rem; right: 1rem; padding: 0.5rem 1rem; cursor: pointer;">
+        Toggle Stats
+      </button>
     </model-viewer>
-    
+
+    <script>
+      document.getElementById('toggle-stats').addEventListener('click', () => {
+        document.getElementById('stats').toggle();
+      });
+    </script>
   </body>
 </html>
