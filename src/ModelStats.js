@@ -15,7 +15,6 @@ export class ModelStats extends HTMLElement {
 
 		if (this.viewer) {
 			this.viewer.addEventListener("load", () => {
-				console.log("Model Viewer loaded");
 				this.calculateStats();
 			});
 		}
@@ -80,7 +79,7 @@ export class ModelStats extends HTMLElement {
 		<div class="row"><span class="label">Materials:</span><span class="val" id="mat">-</span></div>
 		<div class="row"><span class="label">Textures:</span><span class="val" id="tex">-</span></div>
 		<div class="row"><span class="label">Animations:</span><span class="val" id="anim">-</span></div>
-    	`;
+		`;
 	}
 
 	async calculateStats() {
@@ -89,18 +88,13 @@ export class ModelStats extends HTMLElement {
 		// --- File Size ---
 		const src = this.viewer.src;
 		if (src) {
-			fetch(src, { method: "HEAD" })
-				.then((res) => {
-					const size = res.headers.get("content-length");
-					if (size) {
-						this.updateText("file", this.formatBytes(Number(size)));
-					} else {
-						this.updateText("file", "N/A");
-					}
-				})
-				.catch(() => {
-					this.updateText("file", "Unknown");
-				});
+			this.getFileSize(src).then((size) => {
+				if (size === null) {
+					this.updateText("file", "N/A");
+				} else {
+					this.updateText("file", this.formatBytes(size));
+				}
+			});
 		}
 
 		// --- Scene traversal for geometry stats ---
@@ -118,33 +112,37 @@ export class ModelStats extends HTMLElement {
 		const box = new Box3();
 
 		scene.traverse((obj) => {
-			if (obj.isMesh && obj.geometry) {
-				meshCount++;
-				const geom = obj.geometry;
-				triCount += geom.index ? geom.index.count / 3 : geom.attributes.position.count / 3;
-
-				// Bounding Box
-				// We assume the object is part of the model.
-				// expandByObject computes the world-axis-aligned box
-				box.expandByObject(obj);
-
-				// Materials
-				const mats = Array.isArray(obj.material) ? obj.material : [obj.material];
-				mats.forEach((m) => {
-					materials.add(m);
-					// Textures
-					for (const key in m) {
-						const val = m[key];
-						if (val?.isTexture) {
-							textures.add(val.uuid);
-						}
-					}
-				});
+			if (!(obj.isMesh && obj.geometry)) {
+				return;
 			}
+
+			meshCount++;
+			const geom = obj.geometry;
+			triCount += geom.index ? geom.index.count / 3 : geom.attributes.position.count / 3;
+
+			// Bounding Box
+			// We assume the object is part of the model.
+			// expandByObject computes the world-axis-aligned box
+			box.expandByObject(obj);
+
+			// Materials
+			const mats = Array.isArray(obj.material) ? obj.material : [obj.material];
+			mats.forEach((m) => {
+				materials.add(m);
+				// Textures
+				for (const key in m) {
+					const val = m[key];
+					if (val?.isTexture) {
+						textures.add(val.uuid);
+					}
+				}
+			});
 		});
 
 		// Size
-		if (!box.isEmpty()) {
+		if (box.isEmpty()) {
+			this.updateText("size", "0m");
+		} else {
 			const size = new Vector3();
 			box.getSize(size);
 			// Format as W x H x D
@@ -152,8 +150,6 @@ export class ModelStats extends HTMLElement {
 			// Let's assume Y is up, but just printing dimensions is fine.
 			const fmt = (n) => `${n.toFixed(2)}`;
 			this.updateText("size", `${fmt(size.x)} x ${fmt(size.y)} x ${fmt(size.z)}`);
-		} else {
-			this.updateText("size", "0m");
 		}
 
 		const animationCount = this.viewer.availableAnimations
@@ -182,11 +178,47 @@ export class ModelStats extends HTMLElement {
 	}
 
 	/**
+	 * Gets the file size using multiple strategies to handle cached resources.
+	 * @param {string} url - The URL of the file.
+	 * @returns {Promise<number|null>} The file size in bytes, or null if unavailable.
+	 */
+	async getFileSize(url) {
+		const absoluteUrl = new URL(url, window.location.href).href;
+
+		// Strategy 1: Check Performance API (works for cached resources)
+		const perfEntry = performance.getEntriesByName(absoluteUrl).pop();
+
+		if (perfEntry?.decodedBodySize > 0) {
+			return perfEntry.decodedBodySize;
+		}
+
+		// Strategy 2: HEAD request with cache-busting for fresh content-length
+		try {
+			const res = await fetch(url, { method: "HEAD", cache: "no-store" });
+			const size = res.headers.get("content-length");
+			if (size) {
+				return Number(size);
+			}
+		} catch {
+			// Ignore and try next strategy
+		}
+
+		// Strategy 3: GET request and measure blob size
+		try {
+			const res = await fetch(url);
+			const blob = await res.blob();
+			return blob.size;
+		} catch {
+			return null;
+		}
+	}
+
+	/**
 	 * Retrieves the internal Three.js Scene from a <model-viewer> instance.
-	 * * This function bypasses the public API to access the underlying symbol
+	 * This function bypasses the public API to access the underlying symbol
 	 * that holds the scene context. It is robust against minification and
 	 * internal naming changes (e.g., 'model-viewer-scene' vs 'model-viewer-artboard').
-	 * * @param {HTMLElement} viewer - The <model-viewer> DOM element.
+	 * @param {HTMLElement} viewer - The <model-viewer> DOM element.
 	 * @returns {Object|null} The THREE.Scene object, or null if not found.
 	 */
 	getInternalScene(viewer) {
