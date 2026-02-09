@@ -1,7 +1,7 @@
 {
   "name": "@wonder-partners/model-viewer-stats",
   "private": false,
-  "version": "1.0.4",
+  "version": "1.0.5",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/wonder-partners/model-viewer-stats.git"
