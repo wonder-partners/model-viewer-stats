@@ -32,6 +32,7 @@ export class ModelStats extends HTMLElement {
 		this.shadowRoot.innerHTML = html`
 		<style>
 			:host {
+				display: none;
 				position: absolute;
 				top: 1rem;
 				left: 1rem;
@@ -47,7 +48,8 @@ export class ModelStats extends HTMLElement {
 				font-size: 0.9rem;
 			}
 			
-			:host([visible]) { 
+			:host([visible]) {
+				display: block;
 				opacity: 1; 
 			}
 			
