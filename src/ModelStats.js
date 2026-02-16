@@ -7,6 +7,7 @@ export class ModelStats extends HTMLElement {
 		super();
 		this.attachShadow({ mode: "open" });
 		this.viewer = null;
+		this.boundingBox = new Box3();
 	}
 
 	connectedCallback() {
@@ -111,7 +112,7 @@ export class ModelStats extends HTMLElement {
 		let meshCount = 0;
 		const materials = new Set();
 		const textures = new Set();
-		const box = new Box3();
+		this.boundingBox.makeEmpty();
 
 		scene.traverse((obj) => {
 			if (!(obj.isMesh && obj.geometry)) {
@@ -125,7 +126,7 @@ export class ModelStats extends HTMLElement {
 			// Bounding Box
 			// We assume the object is part of the model.
 			// expandByObject computes the world-axis-aligned box
-			box.expandByObject(obj);
+			this.boundingBox.expandByObject(obj);
 
 			// Materials
 			const mats = Array.isArray(obj.material) ? obj.material : [obj.material];
@@ -142,15 +143,15 @@ export class ModelStats extends HTMLElement {
 		});
 
 		// Size
-		if (box.isEmpty()) {
+		if (this.boundingBox.isEmpty()) {
 			this.updateText("size", "0m");
 		} else {
 			const size = new Vector3();
-			box.getSize(size);
+			this.boundingBox.getSize(size);
 			// Format as W x H x D
 			// box.getSize returns width, height, depth.
 			// Let's assume Y is up, but just printing dimensions is fine.
-			const fmt = (n) => `${n.toFixed(2)}`;
+			const fmt = (n) => `${n.toFixed(3)}`;
 			this.updateText("size", `${fmt(size.x)} x ${fmt(size.y)} x ${fmt(size.z)}`);
 		}
 
