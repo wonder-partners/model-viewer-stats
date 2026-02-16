@@ -1,5 +1,3 @@
-import { Box3, Vector3 } from "three";
-
 const html = String.raw;
 
 export class ModelStats extends HTMLElement {
@@ -7,7 +5,6 @@ export class ModelStats extends HTMLElement {
 		super();
 		this.attachShadow({ mode: "open" });
 		this.viewer = null;
-		this.boundingBox = new Box3();
 	}
 
 	connectedCallback() {
@@ -100,6 +97,14 @@ export class ModelStats extends HTMLElement {
 			});
 		}
 
+		// --- Dimensions (official model-viewer API) ---
+		const dimensions = this.viewer.getDimensions();
+		const fmt = (n) => `${n.toFixed(3)}`;
+		this.updateText(
+			"size",
+			`${fmt(dimensions.x)} x ${fmt(dimensions.y)} x ${fmt(dimensions.z)}`,
+		);
+
 		// --- Scene traversal for geometry stats ---
 		const scene = this.getInternalScene(this.viewer);
 
@@ -112,7 +117,6 @@ export class ModelStats extends HTMLElement {
 		let meshCount = 0;
 		const materials = new Set();
 		const textures = new Set();
-		this.boundingBox.makeEmpty();
 
 		scene.traverse((obj) => {
 			if (!(obj.isMesh && obj.geometry)) {
@@ -122,11 +126,6 @@ export class ModelStats extends HTMLElement {
 			meshCount++;
 			const geom = obj.geometry;
 			triCount += geom.index ? geom.index.count / 3 : geom.attributes.position.count / 3;
-
-			// Bounding Box
-			// We assume the object is part of the model.
-			// expandByObject computes the world-axis-aligned box
-			this.boundingBox.expandByObject(obj);
 
 			// Materials
 			const mats = Array.isArray(obj.material) ? obj.material : [obj.material];
@@ -141,19 +140,6 @@ export class ModelStats extends HTMLElement {
 				}
 			});
 		});
-
-		// Size
-		if (this.boundingBox.isEmpty()) {
-			this.updateText("size", "0m");
-		} else {
-			const size = new Vector3();
-			this.boundingBox.getSize(size);
-			// Format as W x H x D
-			// box.getSize returns width, height, depth.
-			// Let's assume Y is up, but just printing dimensions is fine.
-			const fmt = (n) => `${n.toFixed(3)}`;
-			this.updateText("size", `${fmt(size.x)} x ${fmt(size.y)} x ${fmt(size.z)}`);
-		}
 
 		const animationCount = this.viewer.availableAnimations
 			? this.viewer.availableAnimations.length

@@ -9,7 +9,7 @@ A lightweight web component that displays comprehensive statistics for 3D models
 **Displayed Statistics:**
 
 - **File Size**: Head request content length.
-- **Dimensions**: World-axis-aligned bounding box dimensions (W x H x D).
+- **Dimensions**: Model dimensions from `model-viewer` public API (`getDimensions()`), in meters (W x H x D).
 - **Triangles**: Total triangle count.
 - **Meshes**: Number of mesh objects.
 - **Materials**: Number of unique materials.
